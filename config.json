@@ -1,0 +1,14 @@
+{
+   "name": "angular",
+   "className": "CustomApp",
+   "server": "https://rally1.rallydev.com",
+   "sdk": "2.0rc3",
+   "javascript": [
+      "bower_components/angular/angular.js",
+      "bower_components/jquery/dist/jquery.js",
+      "App.js"
+   ],
+   "css": [
+      "app.css"
+   ]
+}
