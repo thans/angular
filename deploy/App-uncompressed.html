@@ -30935,13 +30935,6 @@ Ext.define('CustomApp', {
                 scope: this
             }
         }
-        // ,
-        // {
-        //     xtype: 'container',
-        //     id: 'appContainer',
-        //     width: 500,
-        //     height: 500
-        // }
     ],
 
     launch: function() {
@@ -31129,46 +31122,30 @@ Ext.define('CustomApp', {
 
 */
 
+var Global = {};
 
-
-/*
 Ext.define('CustomApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
-    launch: function() {
-        App = this;
-
-        module = angular.module('angularBlastdown', []);
-    },
-
-    listeners: {
-        render: function(container) {
-            $('#root').show();
-
-            $('body').removeClass('x-body');
-            $('html').removeClass('x-viewport');
-            module.controller('dataController', function($scope) {
-                $scope.age = 1234;
-            });
-
-            angular.bootstrap(document.body, ['angularBlastdown']);
-            var scope = angular.element(document.body).scope();
-
-            scope.app = App.getContext().map.map;
-            scope.$digest();
+    items: [
+        {
+            xtype: 'rallysolrartifactchooserdialog',
+            id: 'portfolioItemPicker',
+            artifactTypes: ['portfolioitem/initiative'],
+            autoShow: true,
+            height: 250,
+            title: 'Choose an Initiative',
+            listeners: {
+                scope: this,
+                artifactChosen: function(picker, selectedRecord) {
+                    Global.itemHierarchy = selectedRecord.get('ObjectID');
+                    $($('.rally-app')[0]).hide();
+                }
+            }
         }
-    }
-
-});
-*/
-
-
-Ext.define('CustomApp', {
-    extend: 'Rally.app.App',
-    componentCls: 'app',
+    ],
     launch: function() {
         App = this;
-
 
         angular.bootstrap(document.body, ['angularBlastdown']);
         var scope = angular.element(document.body).scope();
@@ -31178,21 +31155,37 @@ Ext.define('CustomApp', {
         $('#root').show();
         $('body').removeClass('x-body');
         $('html').removeClass('x-viewport');
-    },
-    listeners: {
-        render: function() {
-            $($('.rally-app')[0]).hide(); // use this to get rid of the ext app when you are done with it
-        }
     }
 });
 
-module = angular.module('angularBlastdown', []);
 
-module.service('RallyDataService', function() {
+
+                module = angular.module('angularBlastdown', []);
+
+
+module.controller('dataController', ['$scope', 'RallyDataService', function($scope, RallyDataService) {
+    $scope.itemHierarchy = Global.itemHierarchy;
+    $scope.organizedData = {
+        initiative: {},
+        features: []
+    };
+    $scope.$watch('organizedData.features', function () {
+        console.log('data updated');
+        console.log($scope.organizedData);
+    });
+    RallyDataService.getData(function(data) {
+        console.log('data returned', data);
+        $scope.organizedData.features = _.toArray(data.features);
+        $scope.$apply();
+    });
+}]);
+
+                module.service('RallyDataService', function() {
     var lookbackStore = Ext.create('Rally.data.lookback.SnapshotStore', {
         fetch: true,
         hydrate: ["ScheduleState", "State", "_TypeHierarchy"],
         findConfig: {
+            "_ItemHierarchy" : Global.itemHierarchy,
             "__At" : "current"
         }
     });
@@ -31291,26 +31284,17 @@ module.service('RallyDataService', function() {
                             console.log('not parented to a feature');
                         }
                     });
-
+                    console.log('aggreate', aggregateData);
                     organizedData.features = aggregateData.features;
-
+                    console.log(organizedData);
                     callbackData(organizedData);
                 }
             });
         }
-    }
+    };
 });
 
-module.controller('dataController', ['$scope', 'RallyDataService', function($scope, RallyDataService) {
-    $scope.age = 1234;
-    $scope.organizedData = {
-        initiative: {},
-        features: {}
-    };
-    RallyDataService.getData(function(data) {
-        $scope.organizedData = data;
-    });
-}]);
+
 
 
             Rally.launchApp('CustomApp', {

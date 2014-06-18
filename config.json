@@ -6,7 +6,9 @@
    "javascript": [
       "bower_components/angular/angular.js",
       "bower_components/jquery/dist/jquery.js",
-      "App.js"
+      "App.js",
+      "angularApp.js",
+      "DataService.js"
    ],
    "html": [
       "body.html"
