@@ -8,6 +8,9 @@
       "bower_components/jquery/dist/jquery.js",
       "App.js"
    ],
+   "html": [
+      "body.html"
+   ],
    "css": [
       "app.css"
    ]
