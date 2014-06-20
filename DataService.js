@@ -59,7 +59,7 @@ module.service('RallyDataService', function() {
                     //           |
                     //           +-->Tasks
                     var organizedData = {
-                        initiative: aggregateData.initiative
+                        initiative: GLOBAL.initiative
                     };
 
                     // Add tasks as children of their associated story/defect
